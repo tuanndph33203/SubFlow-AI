@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from '@google/genai/web';
+import { GoogleGenAI, Type } from '@google/genai';
 import Parser from 'srt-parser-2';
 
 export interface Subtitle {
@@ -21,12 +21,6 @@ export interface TranslatorOptions {
   movieContext?: string;
   tone?: string;
   onProgress: (current: number, total: number, translatedBatch: Subtitle[]) => void;
-}
-
-export interface TranslationEvaluation {
-  score: number;
-  comments: string;
-  suggestions: { original: string, current: string, suggestion: string, reason: string }[];
 }
 
 export class SrtTranslator {
@@ -226,114 +220,5 @@ Return ONLY the rewritten translated text as a plain string, with no quotes or e
     let result = response.text || '';
     result = result.replace(/^```[a-z]*\n/g, '').replace(/\n```$/g, '').trim();
     return result;
-  }
-
-  async summarizeSubtitles(
-    subtitles: Subtitle[],
-    movieContext: string,
-    model: string = 'gemini-2.5-flash'
-  ): Promise<string> {
-    const fullText = subtitles.map(s => s.text).join(' ');
-    const prompt = `You are an expert film analyst. Please read the following subtitle script and provide a brief summary of the movie/video plot.
-    
-Context/Background provided:
-${movieContext || '(None)'}
-
-Subtitle Script:
-${fullText}
-
-Please provide a concise but comprehensive summary of the story based on these subtitles. Write the summary prioritizing the provided context language, and provide insight into the main characters and plot points. Note: Depending on the length of the script, it could be cut short, so summarize what is available.`;
-
-    const response = await this.ai.models.generateContent({
-      model: model,
-      contents: prompt,
-      config: {
-        temperature: 0.7,
-      }
-    });
-
-    return response.text || '';
-  }
-
-  async evaluateTranslation(
-    originalSubtitles: Subtitle[],
-    translatedSubtitles: Subtitle[],
-    targetLanguage: string,
-    movieContext: string,
-    model: string = 'gemini-2.5-flash'
-  ): Promise<TranslationEvaluation> {
-    const sampleSize = Math.min(originalSubtitles.length, 50);
-    const step = Math.max(1, Math.floor(originalSubtitles.length / sampleSize));
-    
-    const samples = [];
-    for (let i = 0; i < originalSubtitles.length; i += step) {
-      if (samples.length < sampleSize) {
-        samples.push({
-          line: i + 1,
-          original: originalSubtitles[i].text,
-          translated: translatedSubtitles[i].text
-        });
-      }
-    }
-
-    const prompt = `You are an expert subtitle translator and reviewer. Evaluate the following translation of a subtitle file into ${targetLanguage}.
-
-Movie/Video Context:
-${movieContext || '(No global context provided)'}
-
-Sample pairs (Original -> Translated):
-${samples.map(s => `[Line ${s.line}]: ${s.original} --> ${s.translated}`).join('\n')}
-
-Based on these samples, evaluate the translation quality, considering naturalness, accuracy, tone consistency, and contextual appropriateness.
-
-Return a JSON object with this exact structure:
-{
-  "score": <number from 1 to 10 evaluating the overall quality>,
-  "comments": "<A summary paragraph describing the quality and areas of improvement in the target language (${targetLanguage})>",
-  "suggestions": [
-    {
-      "original": "<original text>",
-      "current": "<current translation>",
-      "suggestion": "<better translation>",
-      "reason": "<why the suggestion is better (in ${targetLanguage})>"
-    }
-  ]
-}`;
-
-    const response = await this.ai.models.generateContent({
-      model: model,
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            score: { type: Type.NUMBER },
-            comments: { type: Type.STRING },
-            suggestions: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  original: { type: Type.STRING },
-                  current: { type: Type.STRING },
-                  suggestion: { type: Type.STRING },
-                  reason: { type: Type.STRING }
-                }
-              }
-            }
-          }
-        },
-        temperature: 0.3,
-      }
-    });
-
-    const text = response.text || '{}';
-    try {
-      return JSON.parse(text) as TranslationEvaluation;
-    } catch(e) {
-      console.error(e);
-      return { score: 0, comments: 'Failed to parse evaluation response.', suggestions: [] };
-    }
   }
 }

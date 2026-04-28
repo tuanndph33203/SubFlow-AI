@@ -1,4 +1,3 @@
-import React from 'react';
 import { UploadCloud, FileText } from 'lucide-react';
 
 interface FileUploadProps {
@@ -15,7 +14,7 @@ export function FileUpload({ onFilesSelect, accept = ".srt", multiple = true }: 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const files = (Array.from(e.dataTransfer.files) as File[]).filter(file => file.name.endsWith('.srt'));
+      const files = Array.from(e.dataTransfer.files).filter(file => file.name.endsWith('.srt'));
       if (files.length > 0) {
         onFilesSelect(multiple ? files : [files[0]]);
       } else {
@@ -26,7 +25,7 @@ export function FileUpload({ onFilesSelect, accept = ".srt", multiple = true }: 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const files = Array.from(e.target.files) as File[];
+      const files = Array.from(e.target.files);
       onFilesSelect(multiple ? files : [files[0]]);
     }
   };

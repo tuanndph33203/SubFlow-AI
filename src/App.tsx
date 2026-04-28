@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Settings, Download, PlayCircle, Loader2, ArrowRightLeft, FileText, Trash2, Edit3, CheckCircle2, FileSearch, Sparkles } from 'lucide-react';
+import { Settings, Download, PlayCircle, Loader2, ArrowRightLeft, FileText, Trash2, Edit3, CheckCircle2 } from 'lucide-react';
 import { FileUpload } from './components/FileUpload';
-import { SrtTranslator, Subtitle, TranslationStatus, TranslationEvaluation } from './lib/translator';
+import { SrtTranslator, Subtitle, TranslationStatus } from './lib/translator';
 import Parser from 'srt-parser-2';
 
 const parser = new Parser();
@@ -26,12 +26,6 @@ export default function App() {
   const [model, setModel] = useState<'gemini-2.5-flash' | 'gemini-2.5-pro' | 'gemini-3.1-pro-preview' | 'gemini-3-flash-preview'>('gemini-2.5-pro');
   const [movieContext, setMovieContext] = useState('');
   const [tone, setTone] = useState('Bình thường / Tự nhiên');
-
-  const [isSummarizing, setIsSummarizing] = useState(false);
-  const [summary, setSummary] = useState('');
-  
-  const [isEvaluating, setIsEvaluating] = useState(false);
-  const [evaluation, setEvaluation] = useState<TranslationEvaluation | null>(null);
 
   const handleFilesSelect = async (selectedFiles: File[]) => {
     const newTasks: FileTask[] = [];
@@ -157,36 +151,6 @@ export default function App() {
       }
     } catch (error: any) {
       alert("Rewrite failed: " + (error.message || String(error)));
-    }
-  };
-
-  const handleSummarize = async () => {
-    if (!activeTask || activeTask.subtitles.length === 0) return;
-    setIsSummarizing(true);
-    setSummary('');
-    try {
-      const translator = new SrtTranslator();
-      const s = await translator.summarizeSubtitles(activeTask.subtitles, movieContext, model);
-      setSummary(s);
-    } catch (e: any) {
-      alert("Failed to summarize: " + (e.message || String(e)));
-    } finally {
-      setIsSummarizing(false);
-    }
-  };
-
-  const handleEvaluate = async () => {
-    if (!activeTask || activeTask.translatedSubtitles.length === 0 || activeTask.status !== 'done') return;
-    setIsEvaluating(true);
-    setEvaluation(null);
-    try {
-      const translator = new SrtTranslator();
-      const ev = await translator.evaluateTranslation(activeTask.subtitles, activeTask.translatedSubtitles, targetLang, movieContext, model);
-      setEvaluation(ev);
-    } catch (e: any) {
-      alert("Failed to evaluate: " + (e.message || String(e)));
-    } finally {
-      setIsEvaluating(false);
     }
   };
 
@@ -367,67 +331,6 @@ export default function App() {
                       )}
                     </div>
                   </div>
-
-                  <div className="flex bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 p-2 gap-2 overflow-x-auto">
-                    <button
-                      onClick={handleSummarize}
-                      disabled={isSummarizing || activeTask.subtitles.length === 0}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 rounded transition-colors disabled:opacity-50 whitespace-nowrap"
-                    >
-                      {isSummarizing ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> : <FileSearch className="w-3.5 h-3.5" />}
-                      Tóm tắt bộ phim từ Sub gốc
-                    </button>
-                    {(activeTask.status === 'done' || activeTask.translatedSubtitles.length > 0) && (
-                      <button
-                        onClick={handleEvaluate}
-                        disabled={isEvaluating}
-                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-purple-50 text-purple-600 hover:bg-purple-100 dark:bg-purple-900/20 dark:text-purple-400 dark:hover:bg-purple-900/40 rounded transition-colors disabled:opacity-50 whitespace-nowrap"
-                      >
-                        {isEvaluating ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> : <Sparkles className="w-3.5 h-3.5" />}
-                        Đánh giá bản dịch ({targetLang})
-                      </button>
-                    )}
-                  </div>
-
-                  {summary && (
-                    <div className="p-4 bg-blue-50 dark:bg-blue-900/10 border-b border-blue-100 dark:border-blue-900/30 text-sm">
-                      <h4 className="font-semibold text-blue-800 dark:text-blue-300 mb-1 flex items-center gap-2">
-                        <FileSearch className="w-4 h-4" /> Tóm tắt nội dung
-                      </h4>
-                      <p className="text-blue-900 dark:text-blue-200 whitespace-pre-line">{summary}</p>
-                    </div>
-                  )}
-
-                  {evaluation && (
-                    <div className="p-4 bg-purple-50 dark:bg-purple-900/10 border-b border-purple-100 dark:border-purple-900/30 text-sm overflow-y-auto max-h-64">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h4 className="font-semibold text-purple-800 dark:text-purple-300 flex items-center gap-2">
-                          <Sparkles className="w-4 h-4" /> Đánh giá bản dịch
-                        </h4>
-                        <span className="px-2 py-0.5 bg-purple-200 dark:bg-purple-800 text-purple-800 dark:text-purple-200 rounded-full font-bold text-xs">
-                          {evaluation.score}/10
-                        </span>
-                      </div>
-                      <p className="text-purple-900 dark:text-purple-200 mb-3">{evaluation.comments}</p>
-                      
-                      {evaluation.suggestions && evaluation.suggestions.length > 0 && (
-                        <div className="space-y-2">
-                          <h5 className="font-semibold text-purple-800 dark:text-purple-300 text-xs uppercase tracking-wider">Góp ý sửa đổi</h5>
-                          {evaluation.suggestions.map((s, i) => (
-                            <div key={i} className="bg-white/50 dark:bg-zinc-950/50 p-2 rounded border border-purple-100 dark:border-purple-900/30 text-xs">
-                              <p className="font-mono text-zinc-500 mb-1">{s.original}</p>
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="line-through text-red-500">{s.current}</span>
-                                <ArrowRightLeft className="w-3 h-3 text-zinc-400" />
-                                <span className="text-green-600 dark:text-green-400 font-medium">{s.suggestion}</span>
-                              </div>
-                              <p className="text-purple-600 dark:text-purple-400 italic">Lý do: {s.reason}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
 
                   {/* Subtitle Viewer list */}
                   <div className="flex-1 overflow-y-auto p-4 space-y-2">
