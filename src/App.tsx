@@ -194,26 +194,6 @@ export default function App() {
         </div>
 
         <div className="w-full flex-1 py-6 px-3 flex flex-col gap-2 overflow-y-auto">
-          <NavItem 
-            icon={<Subtitles />} 
-            label="SRT Translator" 
-            isActive={activeTab === 'subtitles'} 
-            onClick={() => setActiveTab('subtitles')} 
-          />
-          <NavItem 
-            icon={<Film />} 
-            label="Video Editor" 
-            isActive={activeTab === 'video'} 
-            onClick={() => setActiveTab('video')} 
-          />
-          <NavItem 
-            icon={<Settings />} 
-            label="Project Settings" 
-            isActive={activeTab === 'settings'} 
-            onClick={() => setActiveTab('settings')} 
-          />
-
-          <hr className="border-zinc-200 dark:border-zinc-800 my-4" />
           <div className="px-3 text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 hidden lg:block">Projects</div>
           
           <div className="flex flex-col gap-1">
@@ -222,6 +202,8 @@ export default function App() {
                       key={p._id}
                       onClick={() => {
                           loadProjectConfig(p);
+                          setTasks([]);
+                          setActiveTaskId(null);
                           setActiveTab('subtitles');
                       }}
                       className={`w-full flex items-center lg:justify-start justify-center gap-3 p-2 rounded-xl transition-colors text-sm ${
@@ -243,6 +225,8 @@ export default function App() {
                       setModel('gemini-2.5-pro');
                       setTone('Bình thường / Tự nhiên');
                       setMovieContext('');
+                      setTasks([]);
+                      setActiveTaskId(null);
                       setActiveTab('settings');
                   }} 
                   className="w-full flex items-center lg:justify-start justify-center gap-3 p-2 mt-2 rounded-xl transition-colors text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-dashed border-blue-200 dark:border-blue-800/50"
@@ -259,13 +243,27 @@ export default function App() {
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col h-screen overflow-auto">
         <header className="px-8 py-5 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between">
-           <div>
-               <h1 className="text-xl font-bold">
-                    {activeTab === 'subtitles' && 'Subtitle Translator'}
-                    {activeTab === 'video' && 'Video Editor (Workspace)'}
-                    {activeTab === 'settings' && 'Project Configuration'}
-               </h1>
-               <p className="text-xs text-zinc-500">Project: {projectName}</p>
+           <div className="flex items-center gap-6">
+               <div>
+                   <h1 className="text-xl font-bold truncate max-w-[200px]" title={projectName}>{projectName || 'Select a Project'}</h1>
+               </div>
+               
+               {projectId || projectName === 'New Project' ? (
+               <div className="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-lg">
+                   <button 
+                       onClick={() => setActiveTab('subtitles')}
+                       className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === 'subtitles' ? 'bg-white shadow-sm dark:bg-zinc-700 dark:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+                   >SRT Translator</button>
+                   <button 
+                       onClick={() => setActiveTab('video')}
+                       className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === 'video' ? 'bg-white shadow-sm dark:bg-zinc-700 dark:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+                   >Video Editor</button>
+                   <button 
+                       onClick={() => setActiveTab('settings')}
+                       className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === 'settings' ? 'bg-white shadow-sm dark:bg-zinc-700 dark:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
+                   >Settings</button>
+               </div>
+               ) : null}
            </div>
            
            <button onClick={saveProjectConfig} className="flex items-center gap-2 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity">
