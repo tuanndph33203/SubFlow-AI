@@ -18,7 +18,7 @@ interface FileTask {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'subtitles' | 'video' | 'settings'>('subtitles');
+  const [activeTab, setActiveTab] = useState<'subtitles' | 'settings'>('subtitles');
   
   // Tasks state
   const [tasks, setTasks] = useState<FileTask[]>([]);
@@ -255,10 +255,6 @@ export default function App() {
                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === 'subtitles' ? 'bg-white shadow-sm dark:bg-zinc-700 dark:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
                    >SRT Translator</button>
                    <button 
-                       onClick={() => setActiveTab('video')}
-                       className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === 'video' ? 'bg-white shadow-sm dark:bg-zinc-700 dark:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
-                   >Video Editor</button>
-                   <button 
                        onClick={() => setActiveTab('settings')}
                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${activeTab === 'settings' ? 'bg-white shadow-sm dark:bg-zinc-700 dark:text-white' : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'}`}
                    >Settings</button>
@@ -336,154 +332,6 @@ export default function App() {
                             value={movieContext}
                             onChange={(e) => setMovieContext(e.target.value)}
                         ></textarea>
-                    </div>
-
-                    <hr className="border-zinc-200 dark:border-zinc-800" />
-                    
-                </div>
-            )}
-
-            {activeTab === 'video' && (
-                <div className="h-full flex flex-col gap-4 overflow-hidden">
-                    {/* Top Row: Preview and Tools */}
-                    <div className="flex-1 flex gap-4 min-h-0">
-                        {/* Video Player Preview */}
-                        <div className="flex-1 bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col overflow-hidden">
-                             <div className="flex-1 flex items-center justify-center bg-black/50 relative overflow-hidden">
-                                  <PlayCircle className="w-16 h-16 text-zinc-600 cursor-not-allowed" />
-                                  <div className="absolute inset-x-0 bottom-8 text-center pointer-events-none">
-                                      <p className="text-white text-xl font-medium drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] px-4">[Phụ đề sẽ hiển thị ở đây]</p>
-                                  </div>
-                             </div>
-                             <div className="h-14 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between px-4">
-                                 <div className="flex items-center gap-3">
-                                      <button className="text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"><PlayCircle className="w-6 h-6" /></button>
-                                      <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">00:00:00 / 00:00:00</span>
-                                 </div>
-                                 <div className="flex items-center gap-2">
-                                     <button className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors shadow-sm">Xuất Video (Render)</button>
-                                 </div>
-                             </div>
-                        </div>
-
-                        {/* Right Sidebar: Tools */}
-                        <div className="w-80 flex-shrink-0 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col overflow-y-auto">
-                            <div className="p-4 border-b border-zinc-200 dark:border-zinc-800 font-semibold flex items-center gap-2">
-                                <Settings className="w-4 h-4 text-zinc-500" /> Công cụ chỉnh sửa
-                            </div>
-                            <div className="p-4 space-y-6">
-                                
-                                <div>
-                                    <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3">Tài nguyên</h4>
-                                    <div className="space-y-2">
-                                         <button className="w-full py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-700 transition flex items-center justify-center gap-2">
-                                            <Upload className="w-4 h-4" /> Tải lên Video / Audio
-                                         </button>
-                                         <button onClick={() => setActiveTab('subtitles')} className="w-full py-2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-700 transition flex items-center justify-center gap-2">
-                                            <FileText className="w-4 h-4" /> Quản lý Phụ đề
-                                         </button>
-                                    </div>
-                                </div>
-                                
-                                <hr className="border-zinc-200 dark:border-zinc-800" />
-                                
-                                <div>
-                                    <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3">Tuỳ chỉnh Phụ đề</h4>
-                                    <div className="space-y-3">
-                                        <div className="flex flex-col gap-1">
-                                            <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Kiểu Font</label>
-                                            <select className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 w-full">
-                                                <option>Inter</option>
-                                                <option>Roboto</option>
-                                                <option>Arial</option>
-                                            </select>
-                                        </div>
-                                        <div className="flex flex-col gap-2 mt-2">
-                                            <label className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Màu văn bản & Viền</label>
-                                            <div className="flex gap-2">
-                                                 <div className="w-8 h-8 rounded-full bg-white border border-zinc-200 cursor-pointer ring-2 ring-blue-500 shadow-sm flex items-center justify-center text-black font-bold text-xs uppercase">A</div>
-                                                 <div className="w-8 h-8 rounded-full bg-yellow-400 border border-zinc-200 cursor-pointer shadow-sm flex items-center justify-center text-black font-bold text-xs uppercase" style={{ WebkitTextStroke: '1px black' }}>A</div>
-                                                 <div className="w-8 h-8 rounded-full bg-cyan-400 border border-zinc-200 cursor-pointer shadow-sm flex items-center justify-center text-black font-bold text-xs uppercase" style={{ WebkitTextStroke: '1px black' }}>A</div>
-                                                 <div className="w-8 h-8 rounded-full bg-black border border-zinc-200 cursor-pointer shadow-sm flex items-center justify-center text-white font-bold text-xs uppercase">A</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <hr className="border-zinc-200 dark:border-zinc-800" />
-                                
-                                <div>
-                                     <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-3">Hỗ trợ AI</h4>
-                                     <button className="w-full py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 rounded-lg text-sm font-medium hover:bg-blue-100 transition flex items-center justify-center gap-2">
-                                        <Scissors className="w-4 h-4" /> Smart Cut (Loại khoảng lặng)
-                                     </button>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Bottom Row: Timeline */}
-                    <div className="h-56 flex-shrink-0 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col overflow-hidden">
-                        <div className="h-10 bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 flex items-center px-4 justify-between">
-                            <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Timeline</span>
-                            <div className="flex items-center gap-2 bg-zinc-200/50 dark:bg-zinc-800 rounded-md p-1">
-                                <button className="p-1 px-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 rounded hover:bg-white dark:hover:bg-zinc-700"><ZoomIn className="w-4 h-4" /></button>
-                                <button className="p-1 px-2 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200 rounded hover:bg-white dark:hover:bg-zinc-700"><ZoomOut className="w-4 h-4" /></button>
-                            </div>
-                        </div>
-                        
-                        <div className="flex-1 flex overflow-hidden relative">
-                             {/* Track Headers */}
-                             <div className="w-32 flex-shrink-0 bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 flex flex-col z-20 shadow-[2px_0_4px_rgba(0,0,0,0.05)]">
-                                 <div className="flex-1 border-b border-zinc-200 dark:border-zinc-800 flex items-center px-3 text-xs font-medium text-zinc-700 dark:text-zinc-400 gap-2">
-                                     <Film className="w-3 h-3" /> Video
-                                 </div>
-                                 <div className="flex-1 border-b border-zinc-200 dark:border-zinc-800 flex items-center px-3 text-xs font-medium text-zinc-700 dark:text-zinc-400 gap-2">
-                                     <Volume2 className="w-3 h-3" /> Audio
-                                 </div>
-                                 <div className="flex-1 flex items-center px-3 text-xs font-bold text-blue-600 dark:text-blue-400 gap-2 bg-blue-50/50 dark:bg-blue-900/10">
-                                     <Subtitles className="w-3 h-3" /> Subtitle
-                                 </div>
-                             </div>
-                             
-                             {/* Track Content (Mock Timeline Interface) */}
-                             <div className="flex-1 relative overflow-x-auto overflow-y-hidden bg-zinc-100/50 dark:bg-zinc-900/30">
-                                  {/* Scrubber line */}
-                                  <div className="absolute top-0 bottom-0 w-px bg-red-500 left-[25%] z-10 pointer-events-none">
-                                       <div className="w-2.5 h-2.5 rounded-full bg-red-500 -ml-[4px] border border-white shadow-sm"></div>
-                                  </div>
-                                  
-                                  {/* Ruler scale background pattern (simulated) */}
-                                  <div className="absolute top-0 right-0 left-0 h-4 border-b border-zinc-200 dark:border-zinc-800 flex bg-white/50 dark:bg-zinc-950/50 z-0">
-                                  </div>
-
-                                  <div className="flex flex-col h-full pt-4">
-                                      <div className="flex-1 border-b border-zinc-200 dark:border-zinc-800 relative w-[150%] flex items-center px-2">
-                                           <div className="absolute h-9 left-8 right-[30%] bg-indigo-500/90 rounded-md border border-indigo-600 shadow-sm flex items-center px-3 text-xs text-white/90 overflow-hidden shrink-0 cursor-pointer hover:bg-indigo-500 transition-colors">
-                                               <Film className="w-3 h-3 mr-2 opacity-50" /> video_1_main.mp4
-                                           </div>
-                                      </div>
-                                      <div className="flex-1 border-b border-zinc-200 dark:border-zinc-800 relative w-[150%] flex items-center px-2">
-                                            <div className="absolute h-9 left-8 right-[30%] bg-emerald-500/90 rounded-md border border-emerald-600 shadow-sm flex items-center px-3 overflow-hidden shrink-0 cursor-pointer hover:bg-emerald-500 transition-colors">
-                                                <Volume2 className="w-3 h-3 text-white/50 mr-2" />
-                                                <svg preserveAspectRatio="none" className="w-full h-full opacity-40" viewBox="0 0 100 10"><path d="M0,5 Q5,2 10,5 T20,5 T30,5 T40,5 T50,5 T60,5 T70,5 T80,5 T90,5 T100,5" stroke="currentColor" fill="none" strokeWidth="0.5"/></svg>
-                                            </div>
-                                      </div>
-                                      <div className="flex-1 relative w-[150%] flex items-center px-2 bg-blue-50/30 dark:bg-blue-900/10">
-                                            <div className="absolute h-8 left-[10%] w-32 bg-blue-500 rounded-md border border-blue-600 shadow-sm flex items-center px-2 text-[10px] text-white overflow-hidden whitespace-nowrap cursor-pointer hover:bg-blue-400 transition-colors">
-                                                Xin chào, đây là...
-                                            </div>
-                                            <div className="absolute h-8 left-[22%] w-48 bg-blue-500 rounded-md border border-blue-600 shadow-sm flex items-center px-2 text-[10px] text-white overflow-hidden whitespace-nowrap cursor-pointer hover:bg-blue-400 transition-colors">
-                                                công cụ chỉnh sửa video...
-                                            </div>
-                                            <div className="absolute h-8 left-[38%] w-24 bg-blue-500 rounded-md border border-blue-600 shadow-sm flex items-center px-2 text-[10px] text-white overflow-hidden whitespace-nowrap cursor-pointer hover:bg-blue-400 transition-colors">
-                                                tuyệt vời nhất.
-                                            </div>
-                                      </div>
-                                  </div>
-                             </div>
-                        </div>
                     </div>
                 </div>
             )}
