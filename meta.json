@@ -1,0 +1,107 @@
+{
+  "inputs": {
+    "node_modules/retry/lib/retry_operation.js": {
+      "bytes": 3716,
+      "imports": [],
+      "format": "cjs"
+    },
+    "node_modules/retry/lib/retry.js": {
+      "bytes": 2345,
+      "imports": [
+        {
+          "path": "node_modules/retry/lib/retry_operation.js",
+          "kind": "require-call",
+          "original": "./retry_operation"
+        }
+      ],
+      "format": "cjs"
+    },
+    "node_modules/retry/index.js": {
+      "bytes": 40,
+      "imports": [
+        {
+          "path": "node_modules/retry/lib/retry.js",
+          "kind": "require-call",
+          "original": "./lib/retry"
+        }
+      ],
+      "format": "cjs"
+    },
+    "node_modules/p-retry/index.js": {
+      "bytes": 2077,
+      "imports": [
+        {
+          "path": "node_modules/retry/index.js",
+          "kind": "require-call",
+          "original": "retry"
+        }
+      ],
+      "format": "cjs"
+    },
+    "node_modules/@google/genai/dist/web/index.mjs": {
+      "bytes": 831354,
+      "imports": [
+        {
+          "path": "node_modules/p-retry/index.js",
+          "kind": "import-statement",
+          "original": "p-retry"
+        }
+      ],
+      "format": "esm"
+    },
+    "node_modules/srt-parser-2/dist/index.js": {
+      "bytes": 4498,
+      "imports": [],
+      "format": "esm"
+    },
+    "src/lib/translator.ts": {
+      "bytes": 11034,
+      "imports": [
+        {
+          "path": "node_modules/@google/genai/dist/web/index.mjs",
+          "kind": "import-statement",
+          "original": "@google/genai/web"
+        },
+        {
+          "path": "node_modules/srt-parser-2/dist/index.js",
+          "kind": "import-statement",
+          "original": "srt-parser-2"
+        }
+      ],
+      "format": "esm"
+    }
+  },
+  "outputs": {
+    "out.js": {
+      "imports": [],
+      "exports": [
+        "SrtTranslator"
+      ],
+      "entryPoint": "src/lib/translator.ts",
+      "inputs": {
+        "node_modules/retry/lib/retry_operation.js": {
+          "bytesInOutput": 4230
+        },
+        "node_modules/retry/lib/retry.js": {
+          "bytesInOutput": 2663
+        },
+        "node_modules/retry/index.js": {
+          "bytesInOutput": 131
+        },
+        "node_modules/p-retry/index.js": {
+          "bytesInOutput": 2484
+        },
+        "node_modules/@google/genai/dist/web/index.mjs": {
+          "bytesInOutput": 669134
+        },
+        "node_modules/srt-parser-2/dist/index.js": {
+          "bytesInOutput": 3459
+        },
+        "src/lib/translator.ts": {
+          "bytesInOutput": 9460
+        }
+      },
+      "bytes": 693482
+    }
+  }
+}
