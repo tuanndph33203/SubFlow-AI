@@ -193,7 +193,7 @@ export default function App() {
           <span className="hidden lg:block font-bold text-lg">Video Studio</span>
         </div>
 
-        <div className="w-full flex-1 py-6 px-3 flex flex-col gap-2">
+        <div className="w-full flex-1 py-6 px-3 flex flex-col gap-2 overflow-y-auto">
           <NavItem 
             icon={<Subtitles />} 
             label="SRT Translator" 
@@ -208,10 +208,51 @@ export default function App() {
           />
           <NavItem 
             icon={<Settings />} 
-            label="Project Context" 
+            label="Project Settings" 
             isActive={activeTab === 'settings'} 
             onClick={() => setActiveTab('settings')} 
           />
+
+          <hr className="border-zinc-200 dark:border-zinc-800 my-4" />
+          <div className="px-3 text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2 hidden lg:block">Projects</div>
+          
+          <div className="flex flex-col gap-1">
+              {projectsList.map(p => (
+                  <button 
+                      key={p._id}
+                      onClick={() => {
+                          loadProjectConfig(p);
+                          setActiveTab('subtitles');
+                      }}
+                      className={`w-full flex items-center lg:justify-start justify-center gap-3 p-2 rounded-xl transition-colors text-sm ${
+                          projectId === p._id ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium' : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                      }`}
+                  >
+                      <div className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded ${projectId === p._id ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400' : 'bg-zinc-100 dark:bg-zinc-800'}`}>
+                          <span className="text-[10px] uppercase font-bold">{p.name ? p.name.charAt(0) : 'P'}</span>
+                      </div>
+                      <span className="hidden lg:block truncate text-left flex-1" title={p.name}>{p.name || 'Untitled'}</span>
+                  </button>
+              ))}
+              
+              <button 
+                  onClick={() => {
+                      setProjectId(null);
+                      setProjectName('New Project');
+                      setTargetLang('Vietnamese');
+                      setModel('gemini-2.5-pro');
+                      setTone('Bình thường / Tự nhiên');
+                      setMovieContext('');
+                      setActiveTab('settings');
+                  }} 
+                  className="w-full flex items-center lg:justify-start justify-center gap-3 p-2 mt-2 rounded-xl transition-colors text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-dashed border-blue-200 dark:border-blue-800/50"
+              >
+                  <div className="w-5 h-5 flex-shrink-0 flex items-center justify-center">
+                      <span className="text-lg leading-none">+</span>
+                  </div>
+                  <span className="hidden lg:block text-left flex-1 font-medium">New Project</span>
+              </button>
+          </div>
         </div>
       </nav>
 
@@ -301,19 +342,6 @@ export default function App() {
 
                     <hr className="border-zinc-200 dark:border-zinc-800" />
                     
-                    <div>
-                        <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 mb-2 block">Dự án đã lưu (MongoDB)</label>
-                        <div className="flex flex-col gap-2">
-                             {projectsList.length > 0 ? projectsList.map(p => (
-                                 <button key={p._id} onClick={() => loadProjectConfig(p)} className="text-left w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors border border-zinc-200 dark:border-zinc-700 text-sm flex justify-between">
-                                      <span className="font-medium">{p.name}</span>
-                                      <span className="text-zinc-500 text-xs">{new Date(p.updatedAt).toLocaleDateString()}</span>
-                                 </button>
-                             )) : (
-                                 <p className="text-sm text-zinc-500 italic">Chưa có dự án nào được lưu.</p>
-                             )}
-                        </div>
-                    </div>
                 </div>
             )}
 
